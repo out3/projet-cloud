@@ -14,7 +14,7 @@
                 - Déploiement application (Bash helm) -> Sur Master Kubenetes
                     - Application = Hadoop Spark
 
-##notes
+## notes
 *   un pod = une application
 *   le master et slave ne fonctionne jamais sur la même machine
 *   le master est notre interface pour intéragir avec les slaves. Les requêtes sont envoyé au master donc on ne discute jamais avec les slaves
