@@ -1,8 +1,8 @@
 # projet-cloud
 
 ## Architecture du docker-compose
-Docker-compose.yml >
-    DockerFile >
+- Docker-compose.yml
+    - DockerFile
         - Image Ubuntu
         - Cmds >
             - Installation AWS CLI (Bash)
@@ -13,4 +13,3 @@ Docker-compose.yml >
                 - Installation Helm -> Sur Master Kubernetes
                 - Déploiement application (Bash helm) -> Sur Master Kubenetes
                     - Application = Hadoop Spark
-                
