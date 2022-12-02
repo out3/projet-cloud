@@ -30,3 +30,10 @@
 - https://spark.apache.org/docs/latest/running-on-kubernetes.html
 - https://github.com/rchakode/kube-opex-analytics
 - https://aws.amazon.com/fr/cli/
+
+
+## Session du 02/12/2022
+Objectif 1 : partir de rien pour créer infra Kubernetes
+- Etape 1 : Création du Dockerfile qui déploie la VM principale avec Ubuntu : Jade et Alexandre
+- Etape 2 : Ecrit le script qui créer les VMs sur AWS avec fichier conf : Philippe et Juliana 
+- Etape 3 : Installer Kubernetes + Kubernetes analytics : à voir avancement
