@@ -27,6 +27,6 @@
         *   si on a 2 slaves : il va déployer peut-être 3 workers dans chaque slave
 
 ## Liens
-https://spark.apache.org/docs/latest/running-on-kubernetes.html
-https://github.com/rchakode/kube-opex-analytics
-https://aws.amazon.com/fr/cli/
+- https://spark.apache.org/docs/latest/running-on-kubernetes.html
+- https://github.com/rchakode/kube-opex-analytics
+- https://aws.amazon.com/fr/cli/
