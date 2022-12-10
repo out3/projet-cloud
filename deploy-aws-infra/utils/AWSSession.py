@@ -22,7 +22,7 @@ class AWSSession:
         )
         
     ###
-    # KEY PAIR
+    # KeyPair
     ###
     def create_key_pair(self, name: str) -> dict:
         """
@@ -34,9 +34,9 @@ class AWSSession:
         Returns:
             dict: ec2.KeyPair
         """
-        client = self.session.resource('ec2')
+        resource = self.session.resource('ec2')
         try:
-            new_key_pair = client.create_key_pair(
+            new_key_pair = resource.create_key_pair(
                 KeyName = name,
                 KeyType = "rsa",
                 KeyFormat = "pem"
@@ -46,8 +46,9 @@ class AWSSession:
         else:
             return new_key_pair
         
+
     ###
-    # VPC
+    # Vpc
     ###
     def create_vpc(self, name: str, cidr: str) -> dict:
         """
@@ -60,9 +61,11 @@ class AWSSession:
         Returns:
             dict: ec2.Vpc
         """
-        client = self.session.resource('ec2')
+        resource = self.session.resource('ec2')
+        client = self.session.client('ec2')
         try:
-            new_vpc = client.create_vpc(
+            # Création du VPC
+            new_vpc = resource.create_vpc(
                 CidrBlock = cidr,
                 TagSpecifications = [
                     {
@@ -76,13 +79,54 @@ class AWSSession:
                     }
                 ]
             )
+            new_vpc.wait_until_available()
+            # Activation du DNS publique
+            client.modify_vpc_attribute(
+                VpcId = new_vpc.id,
+                EnableDnsHostnames = {
+                    "Value": True
+                }
+            )
         except ClientError:
             raise
         else:
             return new_vpc
     
     ###
-    # SUBNET
+    # InternetGateway
+    ###
+    def create_internet_gateway(self, name: str) -> dict:
+        resource = self.session.resource('ec2')
+        try:
+            # On créé la passerelle Internet
+            new_internet_gateway = resource.create_internet_gateway(
+                TagSpecifications = [
+                    {
+                        "ResourceType": "internet-gateway",
+                        "Tags": [
+                            {
+                                "Key": "Name",
+                                "Value": name
+                            }
+                        ]
+                    }
+                ]
+            )
+        except ClientError:
+            raise
+        else:
+            return new_internet_gateway
+    
+    def attach_internet_gateway_to_vpc(self, internet_gateway: dict, vpc: dict):
+        try:
+            vpc.attach_internet_gateway(
+                InternetGatewayId = internet_gateway.id
+            )
+        except ClientError:
+            raise
+        
+    ###
+    # Subnet
     ###
     def create_subnet(self, name: str, cidr:str, vpc_id: str) -> dict:
         """
@@ -96,9 +140,10 @@ class AWSSession:
         Returns:
             dict: ec2.Subnet
         """
-        client = self.session.resource('ec2')
+        resource = self.session.resource('ec2')
+        client = self.session.client('ec2')
         try:
-            new_subnet = client.create_subnet(
+            new_subnet = resource.create_subnet(
                 CidrBlock = cidr,
                 VpcId = vpc_id,
                 TagSpecifications = [
@@ -113,14 +158,55 @@ class AWSSession:
                     }
                 ]
             )
+            # On permet le sous-réseau d'attribuer des adresses IP publique aux nouvelles isntances
+            client.modify_subnet_attribute(
+                SubnetId = new_subnet.id,
+                MapPublicIpOnLaunch = {
+                    "Value": True
+                }
+            )
         except ClientError:
             raise
         else:
             return new_subnet
     
+    ###
+    # RouteTable
+    ###
+    def setup_route_table_from_vpc(self, name: str, vpc_id: str, internet_gateway_id: str):
+        client = self.session.client('ec2')
+        resource = self.session.resource('ec2')
+        try:
+            # On récupère l'id de la RouteTable
+            new_route_table = client.describe_route_tables(
+                Filters = [
+                    {
+                        "Name": "vpc-id",
+                        "Values": [ vpc_id ] 
+                    }
+                ]
+            )
+            new_route_table_id = new_route_table["RouteTables"][0]["RouteTableId"]
+            # On donne un nom à la RouteTable
+            resource.RouteTable(new_route_table_id).create_tags(
+                Tags = [
+                    {
+                        "Key": "Name",
+                        "Value": name
+                    }
+                ]
+            )
+            # On créer une route statique par défaut vers la gateway
+            client.create_route(
+                DestinationCidrBlock = "0.0.0.0/0",
+                GatewayId = internet_gateway_id,
+                RouteTableId = new_route_table_id
+            )
+        except ClientError:
+            raise    
     
     ###
-    # Security Group
+    # SecurityGroup
     ###
     def create_security_group(self, name: str, description: str, vpc_id:str) -> dict:
         """
@@ -134,10 +220,10 @@ class AWSSession:
         Returns:
             dict: ec2.securityGroup
         """
-        client = self.session.resource('ec2')
+        resource = self.session.resource('ec2')
         try:
             # Création du Security Group
-            new_security_group = client.create_security_group(
+            new_security_group = resource.create_security_group(
                 GroupName = name,
                 Description = description,
                 VpcId = vpc_id
@@ -167,7 +253,7 @@ class AWSSession:
             return new_security_group
     
     ###
-    # EC2 Instances
+    # Instances
     ###
     def create_ec2_instances(self,
         nb_instance: int,
@@ -193,9 +279,9 @@ class AWSSession:
         Returns:
             dict: ec2.Instance
         """
-        client = self.session.resource('ec2')
+        resource = self.session.resource('ec2')
         try: 
-            new_ec2_instances = client.create_instances(
+            new_ec2_instances = resource.create_instances(
                 
                 ImageId = image_id,
                 MinCount = nb_instance,
@@ -235,7 +321,16 @@ class AWSSession:
         else:
             return new_ec2_instances
         
-    def get_ec2_instance_public_ip(self, instance_id: str):
+    def get_ec2_instance_public_ip(self, instance_id: str) -> str:
+        """
+        Récupère l'adresse IP publique d'une instance EC2
+
+        Args:
+            instance_id (str): Id de l'instance
+
+        Returns:
+            str: Adresse IP publique de l'instance
+        """
         client = self.session.client('ec2')
         try:
             ec2_instance = client.describe_instances(
