@@ -37,9 +37,13 @@ Objectif 1 : partir de rien pour créer infra Kubernetes
 - Etape 1 : Création du Dockerfile qui déploie la VM principale avec Ubuntu : Jade et Alexandre
 - Etape 2 : Ecrit le script qui créer les VMs sur AWS avec fichier conf : Philippe et Juliana 
 - Etape 3 : Installer Kubernetes + Kubernetes analytics : à voir avancement
+- Etape 4 : Spark sur kubernetes : Juliana
 
 
 ### Etape 1
 <img width="712" alt="Capture d’écran 2022-12-12 à 14 35 04" src="https://user-images.githubusercontent.com/57618356/207058158-65810eea-e0b5-4eac-a7f0-a9b01e0c6dc0.png">
+
+### Etape 2
 <img width="876" alt="Capture d’écran 2022-12-12 à 14 55 58" src="https://user-images.githubusercontent.com/57618356/207063273-c8f1f53c-809b-4bd8-8859-36088e6fa3ff.png">
+
 
