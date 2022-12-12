@@ -39,6 +39,7 @@ Objectif 1 : partir de rien pour créer infra Kubernetes
 - Etape 3 : Installer Kubernetes + Kubernetes analytics : à voir avancement
 - Etape 4 : Spark sur kubernetes : Juliana
 
+## Session du 12/12/2022
 
 ### Etape 1
 <img width="712" alt="Capture d’écran 2022-12-12 à 14 35 04" src="https://user-images.githubusercontent.com/57618356/207058158-65810eea-e0b5-4eac-a7f0-a9b01e0c6dc0.png">
