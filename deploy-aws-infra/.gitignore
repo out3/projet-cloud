@@ -1,5 +1,0 @@
-*.log
-*.json
-env/
-*/__pycache__/
-*.pem
