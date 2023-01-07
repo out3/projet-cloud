@@ -1,0 +1,7 @@
+*.log
+*.json
+*/env/
+*/__pycache__/
+*.pyc
+*.pem
+*.env
