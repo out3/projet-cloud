@@ -1,6 +1,8 @@
-import os, json
-from dotenv import load_dotenv
+import os
+import argparse
+import json
 
+from dotenv import load_dotenv
 from utils.AWSSession import AWSSession, ClientError
 
 _UBUNTU_AMI_ID = "ami-03b755af568109dc3"
@@ -8,7 +10,7 @@ _INSTANCE_TYPE = "t2.micro"
 
 load_dotenv()
 
-def main(session):
+def main(session, nb_instance: int) -> dict:
     try:
         # Création d'un VPC Réservé
         vpc = session.create_vpc("ProjetCloud-VPC", "192.168.0.0/24")
@@ -43,7 +45,7 @@ def main(session):
         
         # Création VM EC2
         ec2_instances = session.create_ec2_instances(
-            nb_instance = 1,
+            nb_instance = nb_instance,
             name = "ProjetCloud-InstanceEC2",
             image_id = _UBUNTU_AMI_ID,
             instance_type =_INSTANCE_TYPE,
@@ -87,8 +89,13 @@ if __name__ == '__main__':
         print("AWS_SECRET_ACCESS_KEY undefined in .env")
         exit()
     
+    # Arg parser
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-n", "--nb_instance", type=int, default=3, help="Nombre d'instance EC2 a creer")
+    nb_instance = parser.parse_args().nb_instance
+
     # Création session AWS
     session = AWSSession(os.environ['AWS_ACCESS_KEY_ID'], os.environ['AWS_SECRET_ACCESS_KEY'])
     # Appel de main
-    aws_data = main(session)
+    aws_data = main(session, nb_instance)
     save_data_to_file(aws_data)
