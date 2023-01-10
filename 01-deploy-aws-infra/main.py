@@ -29,8 +29,7 @@ def main(session, nb_instance: int) -> dict:
         session.setup_route_table_from_vpc("ProjetCloud-RoutingTable", vpc_id, internet_gateway_id)        
         
         # Création security group (fw)
-        security_group = session.create_security_group(
-            "ProjetCloud-SecurityGroup",
+        security_group = session.create_security_group("ProjetCloud-SecurityGroup",
             "Security Group utilise pour le projet Infra",
             vpc_id
         )
@@ -38,10 +37,11 @@ def main(session, nb_instance: int) -> dict:
         
         # Création/Importation paire de clé
         key_pair_name = "ProjetCloud-KeyPair"
+        key_pair_path = f"{os.path.dirname(__file__)}/{key_pair_name}.pem"
         key_pair = session.create_key_pair(key_pair_name)
-        with open(f"./{key_pair_name}.pem", "w") as file:
+        with open(key_pair_path, "w") as file:
             file.write(key_pair.key_material)
-        os.chmod(f"{key_pair_name}.pem", 0o600)
+        os.chmod(key_pair_path, 0o600)
         
         # Création VM EC2
         ec2_instances = session.create_ec2_instances(
@@ -65,7 +65,7 @@ def main(session, nb_instance: int) -> dict:
             "InternetGatewayId": internet_gateway_id,
             "SubnetId": subnet_id,
             "SecurityGroupId": security_group_id,
-            "KeyPairPath": f"{os.getcwd()}/{key_pair_name}.pem",
+            "KeyPairPath": key_pair_path,
             "Instances": instances
         }
         
@@ -77,7 +77,7 @@ def main(session, nb_instance: int) -> dict:
         return data
 
 def save_data_to_file(data):
-    with open(f"inventory.json", "w") as file:
+    with open(f"{os.path.dirname(__file__)}/inventory.json", "w") as file:
         json.dump(data, file)
 
 if __name__ == '__main__':
