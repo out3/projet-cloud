@@ -1,6 +1,7 @@
 import os
 import argparse
 import json
+import time
 
 from dotenv import load_dotenv
 from utils.AWSSession import AWSSession, ClientError
@@ -99,3 +100,5 @@ if __name__ == '__main__':
     # Appel de main
     aws_data = main(session, nb_instance)
     save_data_to_file(aws_data)
+    #
+    time.sleep(5)

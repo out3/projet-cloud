@@ -2,6 +2,7 @@ import argparse
 import json
 import os
 import time
+import re
 
 import paramiko
 from termcolor import colored
@@ -270,56 +271,6 @@ def get_nodes(ip, port, user, ssh_key):
     # Close connection
     client.close()
 
-
-def install_kube_opex(ip, port, user, ssh_key):
-    # Banner
-    print("#############################################")
-    print(f"### {ip} : Install kube-opex-analytics \t###")
-    print("#############################################")
-
-    
-    # Connect to instance
-    client = paramiko.SSHClient()
-    client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-    client.connect(ip, port, user, key_filename=ssh_key)
-
-    cmd = "git clone https://github.com/rchakode/kube-opex-analytics.git"
-    output = client.exec_command(cmd)
-    if verbose:
-        print_std(cmd, output, verbose)
-    else:
-        exit_status = output[1].channel.recv_exit_status()
-        if exit_status == 0:
-            print(cmd)
-        else:
-            raise Exception(f"[{exit_status}] Error : {cmd}")
-
-
-    cmd = "kubectl create namespace kube-opex-analytics"
-    output = client.exec_command(cmd)
-    if verbose:
-        print_std(cmd, output, verbose)
-    else:
-        exit_status = output[1].channel.recv_exit_status()
-        if exit_status == 0:
-            print(cmd)
-        else:
-            raise Exception(f"[{exit_status}] Error : {cmd}")
-
-    cmd = "cd kube-opex-analytics && helm upgrade -n kube-opex-analytics --install kube-opex-analytics manifests/helm/"
-    output = client.exec_command(cmd)
-    if verbose:
-        print_std(cmd, output, verbose)
-    else:
-        exit_status = output[1].channel.recv_exit_status()
-        if exit_status == 0:
-            print(cmd)
-        else:
-            raise Exception(f"[{exit_status}] Error : {cmd}")
-
-    # Close connection
-    client.close()
-
 def print_std(command, output, verbose):
     stdin, stdout, stderr = output
     stdout = stdout.readlines()
@@ -366,8 +317,5 @@ if __name__ == '__main__':
         time.sleep(30)
         get_nodes(_MASTER_IP, _PORT, _USER, _SSH_KEY)
 
-        # Install Kube-Opex
-        # install_kube_opex(_MASTER_IP, _PORT, _USER, _SSH_KEY)
-        # get_nodes(_MASTER_IP, _PORT, _USER, _SSH_KEY)
     except Exception as e:
         print(e)
