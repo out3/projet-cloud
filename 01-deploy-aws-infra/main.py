@@ -1,10 +1,17 @@
-import os, json
+import os
+import argparse
+import json
+import time
+
+from dotenv import load_dotenv
 from utils.AWSSession import AWSSession, ClientError
 
 _UBUNTU_AMI_ID = "ami-03b755af568109dc3"
 _INSTANCE_TYPE = "t2.micro"
 
-def main(session):
+load_dotenv()
+
+def main(session, nb_instance: int) -> dict:
     try:
         # Création d'un VPC Réservé
         vpc = session.create_vpc("ProjetCloud-VPC", "192.168.0.0/24")
@@ -23,8 +30,7 @@ def main(session):
         session.setup_route_table_from_vpc("ProjetCloud-RoutingTable", vpc_id, internet_gateway_id)        
         
         # Création security group (fw)
-        security_group = session.create_security_group(
-            "ProjetCloud-SecurityGroup",
+        security_group = session.create_security_group("ProjetCloud-SecurityGroup",
             "Security Group utilise pour le projet Infra",
             vpc_id
         )
@@ -32,14 +38,15 @@ def main(session):
         
         # Création/Importation paire de clé
         key_pair_name = "ProjetCloud-KeyPair"
+        key_pair_path = f"{os.path.dirname(__file__)}/{key_pair_name}.pem"
         key_pair = session.create_key_pair(key_pair_name)
-        with open(f"./{key_pair_name}.pem", "w") as file:
+        with open(key_pair_path, "w") as file:
             file.write(key_pair.key_material)
-        os.chmod(f"{key_pair_name}.pem", 0o600)
+        os.chmod(key_pair_path, 0o600)
         
         # Création VM EC2
         ec2_instances = session.create_ec2_instances(
-            nb_instance = 2,
+            nb_instance = nb_instance,
             name = "ProjetCloud-InstanceEC2",
             image_id = _UBUNTU_AMI_ID,
             instance_type =_INSTANCE_TYPE,
@@ -59,7 +66,7 @@ def main(session):
             "InternetGatewayId": internet_gateway_id,
             "SubnetId": subnet_id,
             "SecurityGroupId": security_group_id,
-            "KeyPairPath": f"{os.getcwd()}/{key_pair_name}.pem",
+            "KeyPairPath": key_pair_path,
             "Instances": instances
         }
         
@@ -71,20 +78,27 @@ def main(session):
         return data
 
 def save_data_to_file(data):
-    with open(f"inventory.json", "w") as file:
+    with open(f"{os.path.dirname(__file__)}/inventory.json", "w") as file:
         json.dump(data, file)
 
 if __name__ == '__main__':
     # Setup env variables
-    if not os.environ['AWS_ACCESS_KEY_ID']:
-        print("AWS_ACCESS_KEY_ID undefined")
+    if not os.getenv('AWS_ACCESS_KEY_ID'):
+        print("AWS_ACCESS_KEY_ID undefined in .env")
         exit()
-    if not os.environ['AWS_SECRET_ACCESS_KEY']:
-        print("AWS_SECRET_ACCESS_KEY undefined")
+    if not os.getenv('AWS_SECRET_ACCESS_KEY'):
+        print("AWS_SECRET_ACCESS_KEY undefined in .env")
         exit()
     
+    # Arg parser
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-n", "--nb_instance", type=int, default=3, help="Nombre d'instance EC2 a creer")
+    nb_instance = parser.parse_args().nb_instance
+
     # Création session AWS
     session = AWSSession(os.environ['AWS_ACCESS_KEY_ID'], os.environ['AWS_SECRET_ACCESS_KEY'])
     # Appel de main
-    aws_data = main(session)
+    aws_data = main(session, nb_instance)
     save_data_to_file(aws_data)
+    #
+    time.sleep(5)

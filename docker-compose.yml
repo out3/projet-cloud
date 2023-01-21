@@ -1,0 +1,16 @@
+version: '3'
+services:
+  ubuntu_env_installer:
+    build: 
+      context: .
+    container_name: ubuntu_env_installer
+    command: >
+      bash -c "python3 /projet/01-deploy-aws-infra/main.py -n ${NB_AWS_INSTANCES}
+      && python3 /projet/02-install-kubernetes/main.py -v"
+    environment:
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+    volumes:
+      - $PWD:/projet
+    stdin_open: true
+    tty: true

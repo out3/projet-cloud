@@ -336,7 +336,7 @@ class AWSSession:
             ec2_instance = client.describe_instances(
                 InstanceIds = [instance_id]
             )
-            ec2_instance_ip = ec2_instance["Reservations"][0]["Instances"][0]["PublicDnsName"]            
+            ec2_instance_ip = ec2_instance["Reservations"][0]["Instances"][0]["PublicIpAddress"]            
         except ClientError:
             raise
         else:
