@@ -87,7 +87,7 @@ def install_spark(ip, port, user, ssh_key, verbose=False):
             raise Exception(f"[{exit_status}] Error : {cmd}")
     
     # Make sure WordCount application is not corrupt
-    cmd =  "jar tf "+ "./projet-cloud/"+ _MYAPP
+    cmd =  "jar tf "+ "./projet-cloud/03-Spark/"+ _MYAPP
     output = client.exec_command(cmd)
     if verbose:
         print_std(cmd, output, verbose)
@@ -99,7 +99,7 @@ def install_spark(ip, port, user, ssh_key, verbose=False):
             raise Exception(f"[{exit_status}] Error : {cmd}")
     
     # Copy WordCount application into pod 
-    cmd =  "kubectl cp ./projet-cloud/"+ _MYAPP +" default/"+ _SPARK_CLUSTER_NAME + "-worker-0:/opt/bitnami/spark/tmp/"
+    cmd =  "kubectl cp ./projet-cloud/03-Spark/"+ _MYAPP +" default/"+ _SPARK_CLUSTER_NAME + "-worker-0:/opt/bitnami/spark/tmp/"
     output = client.exec_command(cmd)
     if verbose:
         print_std(cmd, output, verbose)
@@ -200,7 +200,7 @@ def install_spark(ip, port, user, ssh_key, verbose=False):
     --conf spark.kubernetes.driver.volumes.persistentVolumeClaim.impvc.mount.path=/opt/bitnami/spark/tmp \
     --conf spark.kubernetes.executor.volumes.persistentVolumeClaim.impvc.options.claimName=impvc \
     --conf spark.kubernetes.executor.volumes.persistentVolumeClaim.impvc.mount.path=/opt/bitnami/spark/tmp \
-    """ + "tmp/"+_MYAPP
+    """ + "tmp/"+_MYAPP + "/opt/bitnami/spark/NOTICE"
     output = client.exec_command(cmd)
     if verbose:
         print_std(cmd, output, verbose)
