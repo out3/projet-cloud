@@ -239,3 +239,24 @@ def install_spark(ip, port, user, ssh_key, verbose=False):
             raise Exception(f"[{exit_status}] Error : {cmd}")
 
     print("The end")
+    
+if __name__ == '__main__':
+    # Arg parser
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-v", "--verbose", help="increase output verbosity", action="count")
+    verbose = parser.parse_args().verbose
+    
+    # Setup vars
+    with open(f"{os.path.dirname(__file__)}/../01-deploy-aws-infra/inventory.json", 'r') as file:
+        _DATA = json.load(file)
+    _SSH_KEY = _DATA["KeyPairPath"]
+    _PORT = 22
+    _USER = "ubuntu"
+    _MASTER_IP = _DATA["Instances"][0]["InstanceIp"]
+    _WORKERS_IP = [i["InstanceIp"] for i in _DATA["Instances"][1:]]
+    try:
+        # Install spark & execute word count
+        install_spark(_MASTER_IP, _PORT, _USER, _SSH_KEY, verbose)
+
+    except Exception as e:
+        print(e)
