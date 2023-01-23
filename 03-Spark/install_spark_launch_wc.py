@@ -60,10 +60,7 @@ def install_spark(ip, port, user, ssh_key, verbose=False):
             raise Exception(f"[{exit_status}] Error : {cmd}")
     
     # Test example 
-    cmd = """
-    kubectl exec -ti --namespace default """ + _SPARK_CLUSTER_NAME +"-worker-0 -- " + """
-    spark-submit --master spark://""" + _SPARK_CLUSTER_NAME + """-master-svc:7077  
-    --class org.apache.spark.examples.SparkPi """ + _EXAMPLE_JAR + " 2"
+    cmd = "kubectl exec -ti --namespace default " + _SPARK_CLUSTER_NAME +"-worker-0 -- " + "spark-submit --master spark://" + _SPARK_CLUSTER_NAME + "-master-svc:7077  --class org.apache.spark.examples.SparkPi " + _EXAMPLE_JAR + " 2"
     output = client.exec_command(cmd)
     if verbose:
         print_std(cmd, output, verbose)
@@ -85,7 +82,19 @@ def install_spark(ip, port, user, ssh_key, verbose=False):
             print(cmd)
         else:
             raise Exception(f"[{exit_status}] Error : {cmd}")
-    
+
+    # Install jdk
+    cmd =  "apt-get -y install default-jdk"
+    output = client.exec_command(cmd)
+    if verbose:
+        print_std(cmd, output, verbose)
+    else:
+        exit_status = output[1].channel.recv_exit_status()
+        if exit_status == 0:
+            print(cmd)
+        else:
+            raise Exception(f"[{exit_status}] Error : {cmd}")
+
     # Make sure WordCount application is not corrupt
     cmd =  "jar tf "+ "./projet-cloud/03-Spark/"+ _MYAPP
     output = client.exec_command(cmd)
@@ -111,28 +120,7 @@ def install_spark(ip, port, user, ssh_key, verbose=False):
             raise Exception(f"[{exit_status}] Error : {cmd}")
 
     # Create a pv
-    cmd =  """
-    cat <<EOF | tee impvc0.yaml
-    kind: PersistentVolume
-    apiVersion: v1
-    metadata:
-    name: impvc
-    labels:
-        name: impvc
-    spec:
-    capacity:
-        storage: 2Gi
-    storageClassName: standard
-    accessModes:
-        - ReadOnlyMany
-    gcePersistentDisk:
-        pdName: myvols
-        fsType: ext4
-        readOnly: true
-    EOF
-
-    kubectl apply -f impvc0.yaml -n default
-    """
+    cmd =  "kubectl apply -f ./projet-cloud/03-Spark/impvc0.yaml -n default"
     output = client.exec_command(cmd)
     if verbose:
         print_std(cmd, output, verbose)
@@ -144,26 +132,7 @@ def install_spark(ip, port, user, ssh_key, verbose=False):
             raise Exception(f"[{exit_status}] Error : {cmd}")
 
     #Create a pvc
-    cmd =  """
-    cat <<EOF | tee impvc1.yaml
-    kind: PersistentVolumeClaim
-    apiVersion: v1
-    metadata:
-    name: impvc
-    spec:
-    storageClassName: standard
-    accessModes:
-        - ReadOnlyMany
-    resources:
-        requests:
-        storage: 2Gi
-    selector:
-        matchLabels:
-        name: impvc
-    EOF 
-
-    kubectl apply -f impvc1.yaml -n default
-    """
+    cmd =  "kubectl apply -f ./projet-cloud/03-Spark/impvc1.yaml -n default"
     output = client.exec_command(cmd)
     if verbose:
         print_std(cmd, output, verbose)
@@ -191,16 +160,7 @@ def install_spark(ip, port, user, ssh_key, verbose=False):
             raise Exception(f"[{exit_status}] Error : {cmd}")
 
     #Launch the WordCount application via spark-submit
-    cmd =  """
-    kubectl exec -ti --namespace default """ +_SPARK_CLUSTER_NAME+"""-worker-0 -- spark-submit \
-    --master spark://spark://""" + _SPARK_CLUSTER_NAME + """-master-svc:7077 --class wc.WordCount  \
-    --conf spark.eventLog.enabled=true \
-    --conf spark.eventLog.dir=/opt/bitnami/spark/tmp \
-    --conf spark.kubernetes.driver.volumes.persistentVolumeClaim.impvc.options.claimName=impvc \
-    --conf spark.kubernetes.driver.volumes.persistentVolumeClaim.impvc.mount.path=/opt/bitnami/spark/tmp \
-    --conf spark.kubernetes.executor.volumes.persistentVolumeClaim.impvc.options.claimName=impvc \
-    --conf spark.kubernetes.executor.volumes.persistentVolumeClaim.impvc.mount.path=/opt/bitnami/spark/tmp \
-    """ + "tmp/"+_MYAPP + "/opt/bitnami/spark/NOTICE"
+    cmd =  "kubectl exec -ti --namespace default " +_SPARK_CLUSTER_NAME+"-worker-0 -- spark-submit --master spark://spark://" + _SPARK_CLUSTER_NAME + "-master-svc:7077 --class wc.WordCount --conf spark.eventLog.enabled=true --conf spark.eventLog.dir=/opt/bitnami/spark/tmp --conf spark.kubernetes.driver.volumes.persistentVolumeClaim.impvc.options.claimName=impvc --conf spark.kubernetes.driver.volumes.persistentVolumeClaim.impvc.mount.path=/opt/bitnami/spark/tmp --conf spark.kubernetes.executor.volumes.persistentVolumeClaim.impvc.options.claimName=impvc --conf spark.kubernetes.executor.volumes.persistentVolumeClaim.impvc.mount.path=/opt/bitnami/spark/tmp" + "tmp/"+_MYAPP + "/opt/bitnami/spark/NOTICE"
     output = client.exec_command(cmd)
     if verbose:
         print_std(cmd, output, verbose)
@@ -224,10 +184,7 @@ def install_spark(ip, port, user, ssh_key, verbose=False):
             raise Exception(f"[{exit_status}] Error : {cmd}")
 
     # Copy and read result
-    cmd =  """
-    kubectl cp default/""" +_SPARK_CLUSTER_NAME + """-worker-0:/opt/bitnami/spark/tmp/result/part-0000 . ;
-    tail -n 20 part-0000
-    """
+    cmd =  "kubectl cp default/" +_SPARK_CLUSTER_NAME + "-worker-0:/opt/bitnami/spark/tmp/result/part-0000 . ; tail -n 20 part-0000"
     output = client.exec_command(cmd)
     if verbose:
         print_std(cmd, output, verbose)
