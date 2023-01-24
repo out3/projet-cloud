@@ -154,7 +154,7 @@ def install_spark(ip, port, user, ssh_key, verbose=False):
             raise Exception(f"[{exit_status}] Error : {cmd}")
 
     #verify bound status between the pv & pvc
-    cmd =  " kubectl get pvc | grep 'impvc' | tr -cs '[:alnum:]' '\n' | grep 'Bound'"
+    cmd =  "kubectl get pvc | grep 'impvc' | tr -cs '[:alnum:]' '\n' | grep 'Bound'"
     output = client.exec_command(cmd)
     if verbose:
         print(cmd)
