@@ -32,6 +32,7 @@ def install_spark(ip, port, user, ssh_key, verbose=False):
         exit_status = output[1].channel.recv_exit_status()
         if exit_status == 0:
             print(cmd)
+            print(output[1].read().decode())
         else:
             raise Exception(f"[{exit_status}] Error : {cmd}")
     
@@ -44,6 +45,7 @@ def install_spark(ip, port, user, ssh_key, verbose=False):
         exit_status = output[1].channel.recv_exit_status()
         if exit_status == 0:
             print(cmd)
+            print(output[1].read().decode())
         else:
             raise Exception(f"[{exit_status}] Error : {cmd}")
 
@@ -56,6 +58,7 @@ def install_spark(ip, port, user, ssh_key, verbose=False):
         exit_status = output[1].channel.recv_exit_status()
         if exit_status == 0:
             print(cmd)
+            print(output[1].read().decode())
         else:
             raise Exception(f"[{exit_status}] Error : {cmd}")
     
@@ -68,6 +71,7 @@ def install_spark(ip, port, user, ssh_key, verbose=False):
         exit_status = output[1].channel.recv_exit_status()
         if exit_status == 0:
             print(cmd)
+            print(output[1].read().decode())
         else:
             raise Exception(f"[{exit_status}] Error : {cmd}")
 
@@ -80,6 +84,7 @@ def install_spark(ip, port, user, ssh_key, verbose=False):
         exit_status = output[1].channel.recv_exit_status()
         if exit_status == 0:
             print(cmd)
+            print(output[1].read().decode())
         else:
             raise Exception(f"[{exit_status}] Error : {cmd}")
 
@@ -92,6 +97,7 @@ def install_spark(ip, port, user, ssh_key, verbose=False):
         exit_status = output[1].channel.recv_exit_status()
         if exit_status == 0:
             print(cmd)
+            print(output[1].read().decode())
         else:
             raise Exception(f"[{exit_status}] Error : {cmd}")
 
@@ -104,6 +110,7 @@ def install_spark(ip, port, user, ssh_key, verbose=False):
         exit_status = output[1].channel.recv_exit_status()
         if exit_status == 0:
             print(cmd)
+            print(output[1].read().decode())
         else:
             raise Exception(f"[{exit_status}] Error : {cmd}")
     
@@ -116,6 +123,7 @@ def install_spark(ip, port, user, ssh_key, verbose=False):
         exit_status = output[1].channel.recv_exit_status()
         if exit_status == 0:
             print(cmd)
+            print(output[1].read().decode())
         else:
             raise Exception(f"[{exit_status}] Error : {cmd}")
 
@@ -128,6 +136,7 @@ def install_spark(ip, port, user, ssh_key, verbose=False):
         exit_status = output[1].channel.recv_exit_status()
         if exit_status == 0:
             print(cmd)
+            print(output[1].read().decode())
         else:
             raise Exception(f"[{exit_status}] Error : {cmd}")
 
@@ -140,6 +149,7 @@ def install_spark(ip, port, user, ssh_key, verbose=False):
         exit_status = output[1].channel.recv_exit_status()
         if exit_status == 0:
             print(cmd)
+            print(output[1].read().decode())
         else:
             raise Exception(f"[{exit_status}] Error : {cmd}")
 
@@ -156,6 +166,7 @@ def install_spark(ip, port, user, ssh_key, verbose=False):
         exit_status = output[1].channel.recv_exit_status()
         if exit_status == 0:
             print(cmd)
+            print(output[1].read().decode())
         else:
             raise Exception(f"[{exit_status}] Error : {cmd}")
 
@@ -168,6 +179,7 @@ def install_spark(ip, port, user, ssh_key, verbose=False):
         exit_status = output[1].channel.recv_exit_status()
         if exit_status == 0:
             print(cmd)
+            print(output[1].read().decode())
         else:
             raise Exception(f"[{exit_status}] Error : {cmd}")
     
