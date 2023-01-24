@@ -61,7 +61,20 @@ def install_spark(ip, port, user, ssh_key, verbose=False):
             print(output[1].read().decode())
         else:
             raise Exception(f"[{exit_status}] Error : {cmd}")
-    
+     
+    # waits for the pods to run
+    cmd = "sleep 30"
+    output = client.exec_command(cmd)
+    if verbose:
+        print_std(cmd, output, verbose)
+    else:
+        exit_status = output[1].channel.recv_exit_status()
+        if exit_status == 0:
+            print(cmd)
+            print(output[1].read().decode())
+        else:
+            raise Exception(f"[{exit_status}] Error : {cmd}")
+            
     # Test example 
     cmd = "kubectl exec -ti --namespace default " + _SPARK_CLUSTER_NAME +"-worker-0 -- " + "spark-submit --master spark://" + _SPARK_CLUSTER_NAME + "-master-svc:7077  --class org.apache.spark.examples.SparkPi " + _EXAMPLE_JAR + " 2"
     output = client.exec_command(cmd)
