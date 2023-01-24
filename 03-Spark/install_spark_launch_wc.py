@@ -89,7 +89,7 @@ def install_spark(ip, port, user, ssh_key, verbose=False):
             raise Exception(f"[{exit_status}] Error : {cmd}")
 
     # Install jdk
-    cmd =  "apt-get -y install default-jdk"
+    cmd =  "sudo apt-get -y install default-jdk"
     output = client.exec_command(cmd)
     if verbose:
         print_std(cmd, output, verbose)
