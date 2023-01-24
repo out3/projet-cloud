@@ -62,7 +62,7 @@ def install_spark(ip, port, user, ssh_key, verbose=False):
         else:
             raise Exception(f"[{exit_status}] Error : {cmd}")
      
-    # waits for the pods to run
+    # wait for the pods to start running
     cmd = "sleep 30"
     output = client.exec_command(cmd)
     if verbose:
