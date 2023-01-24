@@ -160,7 +160,7 @@ def install_spark(ip, port, user, ssh_key, verbose=False):
             raise Exception(f"[{exit_status}] Error : {cmd}")
 
     #Launch the WordCount application via spark-submit
-    cmd =  "kubectl exec -ti --namespace default " +_SPARK_CLUSTER_NAME+"-worker-0 -- spark-submit --master spark://spark://" + _SPARK_CLUSTER_NAME + "-master-svc:7077 --class wc.WordCount --conf spark.eventLog.enabled=true --conf spark.eventLog.dir=/opt/bitnami/spark/tmp --conf spark.kubernetes.driver.volumes.persistentVolumeClaim.impvc.options.claimName=impvc --conf spark.kubernetes.driver.volumes.persistentVolumeClaim.impvc.mount.path=/opt/bitnami/spark/tmp --conf spark.kubernetes.executor.volumes.persistentVolumeClaim.impvc.options.claimName=impvc --conf spark.kubernetes.executor.volumes.persistentVolumeClaim.impvc.mount.path=/opt/bitnami/spark/tmp" + " tmp/"+_MYAPP + " /opt/bitnami/spark/NOTICE"
+    cmd =  "kubectl exec -ti --namespace default " +_SPARK_CLUSTER_NAME+"-worker-0 -- spark-submit --master spark://" + _SPARK_CLUSTER_NAME + "-master-svc:7077 --class wc.WordCount --conf spark.eventLog.enabled=true --conf spark.eventLog.dir=/opt/bitnami/spark/tmp --conf spark.kubernetes.driver.volumes.persistentVolumeClaim.impvc.options.claimName=impvc --conf spark.kubernetes.driver.volumes.persistentVolumeClaim.impvc.mount.path=/opt/bitnami/spark/tmp --conf spark.kubernetes.executor.volumes.persistentVolumeClaim.impvc.options.claimName=impvc --conf spark.kubernetes.executor.volumes.persistentVolumeClaim.impvc.mount.path=/opt/bitnami/spark/tmp" + " tmp/"+_MYAPP + " /opt/bitnami/spark/NOTICE"
     output = client.exec_command(cmd)
     if verbose:
         print_std(cmd, output, verbose)
