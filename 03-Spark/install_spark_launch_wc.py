@@ -180,11 +180,12 @@ def install_spark(ip, port, user, ssh_key, verbose=False):
         exit_status = output[1].channel.recv_exit_status()
         if exit_status == 0:
             print(cmd)
+            print(output[1].read().decode())
         else:
             raise Exception(f"[{exit_status}] Error : {cmd}")
 
     # Copy and read result
-    cmd =  "kubectl cp default/" +_SPARK_CLUSTER_NAME + "-worker-0:/opt/bitnami/spark/tmp/result/part-0000 . ; tail -n 20 part-0000"
+    cmd =  "kubectl exec -ti --namespace default " + _SPARK_CLUSTER_NAME + "-worker-0 -- cat /opt/bitnami/spark/tmp/result/part-00000"
     output = client.exec_command(cmd)
     if verbose:
         print_std(cmd, output, verbose)
