@@ -6,7 +6,7 @@ services:
     container_name: ubuntu_env_installer
     command: >
       bash -c "python3 /projet/01-deploy-aws-infra/main.py -n ${NB_AWS_INSTANCES}
-      && python3 /projet/02-install-kubernetes/main.py -v"
+      && python3 /projet/02-install-kubernetes/main.py -v && python3 /projet/03-Spark/install-spark_launch_wc.py"
     environment:
       AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
       AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
