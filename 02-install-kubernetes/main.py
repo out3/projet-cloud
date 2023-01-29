@@ -259,19 +259,12 @@ def get_nodes(ip, port, user, ssh_key):
 
     cmd = "kubectl get nodes && kubectl get pods --all-namespaces"
     output = client.exec_command(cmd)
-    if verbose:
-        print_std(cmd, output, verbose)
-    else:
-        exit_status = output[1].channel.recv_exit_status()
-        if exit_status == 0:
-            print(cmd)
-        else:
-            raise Exception(f"[{exit_status}] Error : {cmd}")
+    print_std(cmd, output)
 
     # Close connection
     client.close()
 
-def print_std(command, output, verbose):
+def print_std(command, output, verbose=1):
     stdin, stdout, stderr = output
     stdout = stdout.readlines()
     stderr = stderr.readlines()
